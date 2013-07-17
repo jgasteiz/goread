@@ -65,6 +65,7 @@ type Includes struct {
 	GoogleAnalyticsHost string
 	IsDev               bool
 	IsAdmin             bool
+	SiteStyleCss        string
 	StripeKey           string
 	StripePlans         []Plan
 }
@@ -75,13 +76,14 @@ var (
 	BootstrapJs  string
 	Jquery       string
 	JqueryUI     string
+	SiteStyleCss string
 	Underscore   string
 	isDevServer  bool
 )
 
 func init() {
 	angular_ver := "1.0.5"
-	bootstrap_ver := "2.3.1"
+	bootstrap_ver := "2.3.2"
 	jquery_ver := "1.9.1"
 	jqueryui_ver := "1.10.3"
 	underscore_ver := "1.4.4"
@@ -93,6 +95,7 @@ func init() {
 		BootstrapJs = fmt.Sprintf("/static/js/bootstrap-%v.js", bootstrap_ver)
 		Jquery = fmt.Sprintf("/static/js/jquery-%v.js", jquery_ver)
 		JqueryUI = fmt.Sprintf("/static/js/jquery-ui-%v.js", jqueryui_ver)
+		SiteStyleCss = "/static/css/styles.css"
 		Underscore = fmt.Sprintf("/static/js/underscore-%v.js", underscore_ver)
 	} else {
 		Angular = fmt.Sprintf("//ajax.googleapis.com/ajax/libs/angularjs/%v/angular.min.js", angular_ver)
@@ -100,6 +103,7 @@ func init() {
 		BootstrapJs = fmt.Sprintf("//netdna.bootstrapcdn.com/twitter-bootstrap/%v/js/bootstrap.min.js", bootstrap_ver)
 		Jquery = fmt.Sprintf("//ajax.googleapis.com/ajax/libs/jquery/%v/jquery.min.js", jquery_ver)
 		JqueryUI = fmt.Sprintf("//ajax.googleapis.com/ajax/libs/jqueryui/%v/jquery-ui.min.js", jqueryui_ver)
+		SiteStyleCss = "/static/css/styles.css"
 		Underscore = fmt.Sprintf("/static/js/underscore-%v.min.js", underscore_ver)
 	}
 }
@@ -116,6 +120,7 @@ func includes(c mpg.Context, w http.ResponseWriter, r *http.Request) *Includes {
 		GoogleAnalyticsId:   GOOGLE_ANALYTICS_ID,
 		GoogleAnalyticsHost: GOOGLE_ANALYTICS_HOST,
 		IsDev:               isDevServer,
+		SiteStyleCss:        SiteStyleCss,
 		StripeKey:           STRIPE_KEY,
 		StripePlans:         STRIPE_PLANS,
 	}
