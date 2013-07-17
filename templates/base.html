@@ -1,199 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="goReadApp">
 <head>
-	<title>go read</title>
+	<title>irakurri go</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="{{.BootstrapCss}}" rel="stylesheet">
 	<link href="{{.SiteStyleCss}}" rel="stylesheet">
-	<style>
-		.ng-cloak {
-			display: none;
-		}
-		body {
-			padding-top: 40px;
-		}
-		.hand {
-			cursor: hand;
-			cursor: pointer;
-		}
-		#nav-right {
-			position: absolute;
-			right: 0;
-			left: auto;
-		}
-		li .btn-group + .btn-group {
-			margin-left: 0;
-		}
-		.nav li .btn-group .dropdown-toggle .caret {
-			border-top-color: #777;
-			border-bottom-color: #777;
-		}
-		.story {
-			border-bottom: 1px solid #ccc;
-			border-left: 1px solid #fff;
-		}
-		.story.selected {
-			border-left: 1px solid #0088cc;
-		}
-		.story-header {
-			position: relative;
-			padding-left: 155px;
-			padding-right: 120px;
-			width: 100%;
-			box-sizing: border-box;
-			-moz-box-sizing: border-box;
-			height: 33px;
-			line-height: 33px;
-			font-size: 13px;
-		}
-		.story-title, .feed-title, .folder-title {
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-		.story-header.read .story-title strong {
-			font-weight: normal !important;
-		}
-		.story-link {
-			color: #333;
-		}
-		.feed-title, .folder-title {
-			padding: 2px;
-		}
-		.feed-title:hover, .folder-title:hover {
-			background-color: #eee;
-		}
-		.story-header.read {
-			background-color: #f5f5f5;
-		}
-		.story-feed {
-			width: 145px;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			position: absolute;
-			white-space: nowrap;
-			left: 5px;
-		}
-		.story-date {
-			position: absolute;
-			right: 5px;
-			top: 0;
-		}
-		.story-content h3 {
-			margin: 0;
-			margin-top: 4px;
-			line-height: 24px;
-		}
-		.story-content {
-			margin: 0.5em;
-		}
-		.story-content.short {
-			max-width: 650px;
-		}
-		.story-footer {
-			background-color: #f5f5f5;
-			padding-left: 7px;
-			height: 25px;
-		}
-		.active-name {
-			font-weight: bold;
-			padding: 10px 0;
-		}
-		#story-list {
-			position: absolute;
-			left: 245px;
-			overflow-y: auto;
-			top: 40px;
-			bottom: 0;
-			right: 0;
-		}
-		#story-list.no-nav {
-			left: 20px;
-		}
-		#story-list .config {
-			margin-right: 20px;
-		}
-		#feed-list {
-			position: absolute;
-			font-size: 13px;
-			width: 220px;
-			top: 40px;
-			bottom: 0;
-			overflow: hidden;
-			left: 20px;
-			padding-top: 10px;
-		}
-		#feed-list:hover {
-			overflow-y: auto;
-		}
-		.active {
-			color: #d14;
-		}
-		.feed-child {
-			margin-left: 20px;
-		}
-		.feed-icon {
-			width: 16px;
-			height: 16px;
-		}
-		.all-subs {
-			font-weight: bold;
-			padding: 5px 0;
-		}
-		.top-margin {
-			margin-top: 20px;
-		}
-		a.brand {
-			background-image: url("/static/icon.png");
-			background-repeat: no-repeat;
-			background-position: 20px 7px;
-			background-size: 24px;
-			padding-left: 54px !important;
-		}
-		.bold {
-			font-weight: bold;
-		}
-		#story-list::-webkit-scrollbar { width: 8px; height: 8px }
-		#story-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-		#story-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.4); }
-		#feed-list::-webkit-scrollbar { width: 8px; }
-		#feed-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-		#feed-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.4); }
-		@media (max-width: 979px) {
-			body {
-				padding-top: 0;
-			}
-			body, .story-header, .story-content, .btn {
-				font-size: 14px;
-			}
-			#nav-right {
-				position: relative;
-				left: 0;
-				right: auto;
-			}
-			a.brand {
-				background-position: 0px 7px;
-				padding-left: 34px !important;
-				margin-left: -4px !important;
-			}
-			.navbar-fixed-top {
-				margin-bottom: 0;
-			}
-			#feed-list {
-				display: none;
-			}
-			#story-list {
-				position: static;
-				margin-left: -19px;
-				margin-right: -19px;
-			}
-			.story-header {
-				padding: 0;
-				height: 43px;
-				line-height: 43px;
-			}
-		}
-	</style>
 	<link rel="shortcut icon" href="/static/favicon.png">
 </head>
 <body ng-controller="GoreadCtrl" class="ng-cloak">
@@ -205,7 +16,7 @@
 				<span class="icon-bar"></span>
 			</button>
 			<div class="container-fluid">
-				<a class="brand" href="{{url "main"}}">go read</a>
+				<a class="brand" href="{{url "main"}}">irakurri go</a>
 				<div class="nav-collapse collapse">
 					<ul class="nav">
 						<li ng-class="{active: shown == 'about'}"><a href="#" ng-click="shown = 'about'">about</a></li>
@@ -299,9 +110,6 @@
 								<b class="caret"></b>
 							</a>
 							<ul class="dropdown-menu">
-								{{if .StripeKey}}
-								<li><a href="#" ng-click="getAccount()">account</a></li>
-								{{end}}
 								<li><a href="#" ng-click="setAddSubscription()">add subscription</a></li>
 								<li><a href="#" ng-click="shown = 'import-opml'">import opml</a></li>
 								<li class="divider"></li>
@@ -322,79 +130,6 @@
 		</div>
 	</div>
 	<div class="container-fluid">
-		{{if and .User .StripeKey}}
-		<div
-			class="row-fluid top-margin"
-			ng-show="shown == 'account'"
-			id="account"
-			data-url-charge="{{url "charge"}}"
-			data-url-donate="{{url "donate"}}"
-			data-url-account="{{url "account"}}"
-			data-url-uncheckout="{{url "uncheckout"}}"
-			data-stripe-key="{{.StripeKey}}"
-			ng-init="accountType = {{.User.Account}}"
-			>
-			<div class="offset3 span6">
-				<h1>Account</h1>
-				<p>Go Read is supported by user subscriptions. Without them, we cannot pay for our servers.</p>
-				<div ng-hide="accountType">
-					<div>
-						{{range .StripePlans}}
-						<button
-							class="btn btn-primary btn-large"
-							ng-click="checkout('{{.Id}}', '{{.Desc}}', {{.Amount}})"
-							data-loading-text="Working..."
-							id="button{{.Id}}"
-							>Subscribe for {{.Name}}</button>
-						{{end}}
-					</div>
-					<br>
-					<a href="https://stripe.com" target="_blank"><img src="/static/img/stripe.png"></a>
-					<h3>Reasons to subscribe</h3>
-					<ul>
-						<li>higher feed update frequency</li>
-						<li>funding for new features:
-							<ul>
-								<li>search</li>
-								<li>all items mode for everything, not just one feed</li>
-								<li>HTTPS</li>
-								<li>others</li>
-							</ul>
-						</li>
-						<li>Go Read servers cost money - without subscriptions we cannot stay online</li>
-						<li>Some future features will be subscriber-only</li>
-					</ul>
-				</div>
-				<div ng-show="accountType">
-					<h3>Subscribed on <span ng-bind="date(account.Created)"></span></h3>
-					<h5>Next payment:
-						<span ng-show="account">
-							${{`{{account.Amount/100}}`}} on {{`{{date(account.Next)}}`}}, recurring each {{`{{account.Interval}}`}}
-						</span>
-					</h5>
-					<button class="btn" ng-click="unCheckout()" data-loading-text="Working..." id="uncheckoutButton">Unsubscribe</button>
-				</div>
-				<div>
-					<h3>Donation</h3>
-					<p>Want to spend more than $3?</p>
-						<form class="form-inline">
-						<div class="input-prepend input-append">
-							<span class="add-on">$</span>
-							<input type="number" class="input-small" ng-model="donateAmount" min="2" ng-init="donateAmount = 5">
-						</div>
-						<button
-							class="btn btn-success"
-							ng-click="donate()"
-							id="donateButton"
-							data-loading-text="Working..."
-							>Donate
-						</button>
-						</form>
-					<p>Some features have unavoidable costs, and won't be implemented until they are sustainable. For example, HTTPS requires purchase of certificates and other costs. Donations help fund these features faster. Donations do not mark your account as a subscriber - they are just a way to donate.</p>
-				</div>
-			</div>
-		</div>
-		{{end}}
 		<div class="row-fluid top-margin" ng-show="shown == 'about'">
 			<div class="offset3 span6">
 				<h1>About</h1>
@@ -474,12 +209,6 @@
 						</div>
 					</li>
 				</ul>
-				{{if .StripeKey}}
-				<ul class="unstyled" ng-hide="accountType">
-					<li><button class="btn btn-success" ng-click="getAccount()">upgrade</button></li>
-					<li>to keep Go Read alive</li>
-				</ul>
-				{{end}}
 			</div>
 
 			<div
@@ -632,10 +361,10 @@
 				<div class="offset1 span10" ng-hide="shown">
 					<div class="hero-unit">
 						<h1>Hi, RSS user</h1>
-						<p>Go Read is a web-based RSS reader.</p>
+						<p>Irakurri Go, a fork of <a target="_blank" href="http://www.goread.io/">Go Read</a>, is a web-based RSS reader.</p>
 						<p>It is designed to be as useful as Google Reader.</p>
 						<p><a class="btn btn-primary btn-large" href="{{url "login-google"}}">sign up / log in with google</a></p>
-						<p class="alert alert-info">We've just released! Read the <strong><a href="http://mattjibson.com/blog/2013/06/26/go-read-open-source-google-reader-clone/">blog post</a></strong> about it.</p>
+						<p class="alert alert-info">Read the <strong><a target="_blank" href="http://mattjibson.com/blog/2013/06/26/go-read-open-source-google-reader-clone/">blog post</a></strong> about the original application, Go Read.</p>
 					</div>
 				</div>
 			</div>
