@@ -69,6 +69,7 @@ func init() {
 	router.Handle("/user/list-feeds", mpg.NewHandler(ListFeeds)).Name("list-feeds")
 	router.Handle("/user/mark-all-read", mpg.NewHandler(MarkAllRead)).Name("mark-all-read")
 	router.Handle("/user/mark-read", mpg.NewHandler(MarkRead)).Name("mark-read")
+	router.Handle("/user/mark-unread", mpg.NewHandler(MarkUnread)).Name("mark-unread")
 	router.Handle("/user/save-options", mpg.NewHandler(SaveOptions)).Name("save-options")
 	router.Handle("/user/upload-opml", mpg.NewHandler(UploadOpml)).Name("upload-opml")
 
@@ -126,7 +127,7 @@ func addFeed(c mpg.Context, userid string, outline *OpmlOutline) error {
 			for _, s := range stories {
 				s.Created = s.Published
 			}
-			if err := updateFeed(c, f.Url, feed, stories); err != nil {
+			if err := updateFeed(c, f.Url, feed, stories, false); err != nil {
 				return err
 			}
 

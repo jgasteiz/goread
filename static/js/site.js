@@ -143,6 +143,7 @@ goReadAppModule.controller('GoreadCtrl', function($scope, $http, $timeout, $wind
 						if ($scope.last < stories[i].Date) {
 							$scope.last = stories[i].Date;
 						}
+						stories[i].canUnread = true;
 						$scope.stories.push(stories[i]);
 						$scope.unreadStories[stories[i].guid] = true;
 					}
@@ -301,6 +302,7 @@ goReadAppModule.controller('GoreadCtrl', function($scope, $http, $timeout, $wind
 			if (!s.read) {
 				if ($scope.opts.mode == 'unread') s.remove = true;
 				s.read = true;
+				delete s.Unread;
 				$scope.markReadStories.push({
 					Feed: s.feed.XmlUrl,
 					Story: s.Id
@@ -324,12 +326,38 @@ goReadAppModule.controller('GoreadCtrl', function($scope, $http, $timeout, $wind
 			$scope.http('POST', $('#mark-all-read').attr('data-url'), { last: $scope.last });
 	};
 
+	$scope.markUnread = function(s) {
+		var uc = !s.Unread;
+		var attr = uc ? '' : 'un';
+		$scope.http('POST', $('#mark-all-read').attr('data-url-' + attr + 'read'), {
+			feed: s.feed.XmlUrl,
+			story: s.Id
+		});
+		if (uc) {
+			delete $scope.unreadStories[s.guid];
+			delete s.Unread;
+			s.read = true;
+			s.remove = true;
+		} else {
+			$scope.unreadStories[s.guid] = true;
+			s.Unread = true;
+			delete s.read;
+			delete s.remove;
+		}
+		if ($scope.stories.indexOf(s) == -1) {
+			$scope.stories.push(s);
+		}
+		$scope.update();
+	};
+
 	$scope.sendReadStories = _.debounce(function() {
 		var ss = $scope.markReadStories;
 		$scope.markReadStories = [];
-		$scope.http('POST', $('#mark-all-read').attr('data-url-read'), {
-			stories: JSON.stringify(ss)
-		});
+		if (ss.length > 0) {
+			$scope.http('POST', $('#mark-all-read').attr('data-url-read'), {
+				stories: JSON.stringify(ss)
+			});
+		}
 	}, 1000);
 
 	$scope.active = function() {
@@ -811,8 +839,7 @@ goReadAppModule.controller('GoreadCtrl', function($scope, $http, $timeout, $wind
 					})
 					.error(function(data) {
 						button.button('reset');
-						console.log(data);
-						alert('Error');
+						alert(data);
 					});
 			};
 			StripeCheckout.open({
@@ -914,6 +941,17 @@ goReadAppModule.controller('GoreadCtrl', function($scope, $http, $timeout, $wind
 			return false;
 		}
 	});
+	Mousetrap.bind('b', function() {
+		var s = $scope.dispStories[$scope.currentStory];
+		if (s) {
+			var $link = document.createElement("a");
+			$link.href = s.Link;
+			var evt = document.createEvent("MouseEvents");
+			evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null);
+			$link.dispatchEvent(evt);
+			return false;
+		}
+	});
 	Mousetrap.bind('shift+a', function() {
 		if ($scope.nouser) {
 			return;
@@ -947,6 +985,22 @@ goReadAppModule.controller('GoreadCtrl', function($scope, $http, $timeout, $wind
 		$scope.$apply("setExpanded(false)");
 		return false;
 	});
+	Mousetrap.bind('m', function() {
+		var s = $scope.dispStories[$scope.currentStory];
+		if (s) {
+			$scope.$apply(function() {
+				s.Unread = !s.Unread;
+				$scope.markUnread(s);
+			});
+		}
+		return false;
+	});
+
+	$scope.registerHandler = function() {
+		if (navigator && navigator.registerContentHandler) {
+			navigator.registerContentHandler("application/vnd.mozilla.maybe.feed", "http://" + window.location.host + "/user/add-subscription?url=%s", "Go Read");
+		}
+	};
 
 	$scope.showMessage = function(m) {
 		$('#message-list').text(m);

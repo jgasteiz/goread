@@ -209,7 +209,7 @@ func SubscribeCallback(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		b, _ := ioutil.ReadAll(r.Body)
 		nf, ss := ParseFeed(c, f.Url, b)
-		err := updateFeed(c, f.Url, nf, ss)
+		err := updateFeed(c, f.Url, nf, ss, false)
 		if err != nil {
 			c.Errorf("push error: %v", err)
 		}
@@ -251,16 +251,25 @@ func UpdateFeeds(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 	q := datastore.NewQuery("F").KeysOnly().Filter("n <=", time.Now())
 	q = q.Limit(1000)
 	cs := r.FormValue("c")
+	hasCursor := false
 	if len(cs) > 0 {
 		if cur, err := datastore.DecodeCursor(cs); err == nil {
 			q = q.Start(cur)
+			hasCursor = true
 			c.Infof("starting at %v", cur)
 		} else {
 			c.Errorf("cursor error %v", err.Error())
 		}
 	}
+	if !hasCursor {
+		qs, err := taskqueue.QueueStats(c, []string{"update-feed"}, 0)
+		if err != nil || qs[0].Tasks > 0 || qs[0].Executed1Minute > 0 {
+			c.Errorf("already %v (%v) tasks", qs[0].Tasks, qs[0].Executed1Minute)
+			return
+		}
+	}
 	var keys []*datastore.Key
-	it := q.Run(Timeout(c, time.Second*15))
+	it := q.Run(Timeout(c, time.Second*60))
 	for {
 		k, err := it.Next(nil)
 		if err == datastore.Done {
@@ -358,7 +367,7 @@ func fetchFeed(c mpg.Context, origUrl, fetchUrl string) (*Feed, []*Story) {
 	return nil, nil
 }
 
-func updateFeed(c mpg.Context, url string, feed *Feed, stories []*Story) error {
+func updateFeed(c mpg.Context, url string, feed *Feed, stories []*Story, updateAll bool) error {
 	gn := goon.FromContext(c)
 	f := Feed{Url: url}
 	if err := gn.Get(&f); err != nil {
@@ -371,7 +380,7 @@ func updateFeed(c mpg.Context, url string, feed *Feed, stories []*Story) error {
 	storyDate := f.Updated
 
 	hasUpdated := !feed.Updated.IsZero()
-	isFeedUpdated := f.Updated == feed.Updated
+	isFeedUpdated := f.Updated.Equal(feed.Updated)
 	if !hasUpdated {
 		feed.Updated = f.Updated
 	}
@@ -379,7 +388,7 @@ func updateFeed(c mpg.Context, url string, feed *Feed, stories []*Story) error {
 	feed.Average = f.Average
 	f = *feed
 
-	if hasUpdated && isFeedUpdated {
+	if hasUpdated && isFeedUpdated && !updateAll {
 		c.Infof("feed %s already updated to %v, putting", url, feed.Updated)
 		f.Updated = time.Now()
 		gn.Put(&f)
@@ -404,7 +413,7 @@ func updateFeed(c mpg.Context, url string, feed *Feed, stories []*Story) error {
 	for i, s := range getStories {
 		if goon.NotFound(err, i) {
 			updateStories = append(updateStories, stories[i])
-		} else if !stories[i].Updated.IsZero() && !stories[i].Updated.Equal(s.Updated) {
+		} else if (!stories[i].Updated.IsZero() && !stories[i].Updated.Equal(s.Updated)) || updateAll {
 			stories[i].Created = s.Created
 			stories[i].Published = s.Published
 			updateStories = append(updateStories, stories[i])
@@ -441,9 +450,7 @@ func updateFeed(c mpg.Context, url string, feed *Feed, stories []*Story) error {
 	scheduleNextUpdate(&f)
 	delay := f.NextUpdate.Sub(time.Now())
 	c.Infof("next update scheduled for %v from now", delay-delay%time.Second)
-
 	gn.PutMulti(puts)
-
 	return nil
 }
 
@@ -476,15 +483,13 @@ func UpdateFeed(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 		c.Warningf("error with %v (%v), bump next update to %v", url, f.Errors, f.NextUpdate)
 	}
 
-	c.Infof("fetching")
 	if feed, stories := fetchFeed(c, f.Url, f.Url); feed != nil {
-		if err := updateFeed(c, f.Url, feed, stories); err != nil {
+		if err := updateFeed(c, f.Url, feed, stories, false); err != nil {
 			feedError()
 		}
 	} else {
 		feedError()
 	}
-	c.Infof("done")
 }
 
 func CFixer(c mpg.Context, w http.ResponseWriter, r *http.Request) {
@@ -550,9 +555,6 @@ func CFixer(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 			c.Errorf("taskqueue error: %v", err.Error())
 		}
 	}
-}
-
-func fixCreatedDate(c mpg.Context, f *Feed) {
 }
 
 func CFix(c mpg.Context, w http.ResponseWriter, r *http.Request) {

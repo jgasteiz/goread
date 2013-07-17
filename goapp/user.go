@@ -21,12 +21,14 @@ import (
 	"archive/zip"
 	"bytes"
 	"compress/gzip"
+	"encoding/gob"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -149,17 +151,29 @@ func saveFile(c appengine.Context, b []byte) (appengine.BlobKey, error) {
 	return w.Key()
 }
 
+const oldDuration = time.Hour * 24 * 7 * 2 // two weeks
+const numStoriesLimit = 1000
+
 func ListFeeds(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 	cu := user.Current(c)
 	gn := goon.FromContext(c)
 	u := &User{Id: cu.ID}
 	ud := &UserData{Id: "data", Parent: gn.Key(u)}
 	gn.GetMulti([]interface{}{u, ud})
+	put := false
+	fixRead := false
+	if time.Since(u.Read) > oldDuration {
+		c.Warningf("u.Read too old, fixing: %v", u.Read)
+		u.Read = time.Now().Add(-oldDuration)
+		put = true
+		fixRead = true
+		c.Warningf("new: %v", u.Read)
+	}
 
 	read := make(Read)
 	var uf Opml
 	c.Step("unmarshal user data", func() {
-		json.Unmarshal(ud.Read, &read)
+		gob.NewDecoder(bytes.NewReader(ud.Read)).Decode(&read)
 		json.Unmarshal(ud.Opml, &uf)
 	})
 	var feeds []*Feed
@@ -186,6 +200,7 @@ func ListFeeds(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 	updatedLinks := false
 	icons := make(map[string]string)
 	now := time.Now()
+	numStories := 0
 
 	c.Step("feed fetch + wait", func() {
 		queue := make(chan *Feed)
@@ -193,14 +208,13 @@ func ListFeeds(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 		feedProc := func() {
 			for f := range queue {
 				defer wg.Done()
-				var newStories []*Story
+				var stories []*Story
 
 				if u.Read.Before(f.Date) {
-					c.Debugf("query for %v", f.Url)
 					fk := gn.Key(f)
 					sq := q.Ancestor(fk).Filter(IDX_COL+" >", u.Read).KeysOnly().Order("-" + IDX_COL)
 					keys, _ := gn.GetAll(sq, nil)
-					stories := make([]*Story, len(keys))
+					stories = make([]*Story, len(keys))
 					for j, key := range keys {
 						stories[j] = &Story{
 							Id:     key.StringID(),
@@ -208,18 +222,6 @@ func ListFeeds(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 						}
 					}
 					gn.GetMulti(stories)
-					for _, st := range stories {
-						found := false
-						for _, s := range read[f.Url] {
-							if s == st.Id {
-								found = true
-								break
-							}
-						}
-						if !found {
-							newStories = append(newStories, st)
-						}
-					}
 				}
 				if f.Link != opmlMap[f.Url].HtmlUrl {
 					updatedLinks = true
@@ -237,8 +239,9 @@ func ListFeeds(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 				}
 				f.Subscribe(c)
 				lock.Lock()
-				fl[f.Url] = newStories
-				if len(newStories) > 0 {
+				fl[f.Url] = stories
+				numStories += len(stories)
+				if len(stories) > 0 {
 					hasStories = true
 				}
 				if f.Image != "" {
@@ -260,6 +263,56 @@ func ListFeeds(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 		close(queue)
 		wg.Wait()
 	})
+	if numStories > numStoriesLimit {
+		c.Step("numStories", func() {
+			c.Errorf("too many stories: %v", numStories)
+			stories := make([]*Story, 0, numStories)
+			for _, v := range fl {
+				stories = append(stories, v...)
+			}
+			sort.Sort(sort.Reverse(Stories(stories)))
+			last := stories[numStoriesLimit].Created
+			stories = stories[:numStoriesLimit]
+			u.Read = last
+			put = true
+			fixRead = true
+			fl = make(map[string][]*Story)
+			for _, s := range stories {
+				fk := s.Parent.StringID()
+				p := fl[fk]
+				fl[fk] = append(p, s)
+			}
+			c.Errorf("filtered: %v, %v", len(stories), last)
+		})
+	}
+	if fixRead {
+		c.Step("fix read", func() {
+			nread := make(Read)
+			for k, v := range fl {
+				for _, s := range v {
+					rs := readStory{Feed: k, Story: s.Id}
+					if read[rs] {
+						nread[rs] = true
+					}
+				}
+			}
+			c.Errorf("fix read: %v -> %v", len(read), len(nread))
+			read = nread
+			var b bytes.Buffer
+			gob.NewEncoder(&b).Encode(&read)
+			ud.Read = b.Bytes()
+			put = true
+		})
+	}
+	for k, v := range fl {
+		newStories := make([]*Story, 0, len(v))
+		for _, s := range v {
+			if !read[readStory{Feed: k, Story: s.Id}] {
+				newStories = append(newStories, s)
+			}
+		}
+		fl[k] = newStories
+	}
 	if !hasStories {
 		var last time.Time
 		for _, f := range feeds {
@@ -269,14 +322,17 @@ func ListFeeds(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 		}
 		if u.Read.Before(last) {
 			c.Debugf("setting %v read to %v", cu.ID, last)
+			put = true
 			u.Read = last
 			ud.Read = nil
-			gn.PutMany(u, ud)
 		}
 	}
 	if updatedLinks {
 		ud.Opml, _ = json.Marshal(&uf)
-		gn.Put(ud)
+		put = true
+	}
+	if put {
+		gn.PutMany(u, ud)
 	}
 	c.Step("json marshal", func() {
 		o := struct {
@@ -307,7 +363,6 @@ func ListFeeds(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 		}
 		w.Write(b)
 	})
-	_ = utf8.RuneError
 }
 
 func cleanNonUTF8(s string) string {
@@ -325,10 +380,6 @@ func MarkRead(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 	cu := user.Current(c)
 	gn := goon.FromContext(c)
 	read := make(Read)
-
-	type readStory struct {
-		Feed, Story string
-	}
 	var stories []readStory
 	if r.FormValue("stories") != "" {
 		json.Unmarshal([]byte(r.FormValue("stories")), &stories)
@@ -347,12 +398,39 @@ func MarkRead(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 			Parent: gn.Key(u),
 		}
 		gn.Get(ud)
-		json.Unmarshal(ud.Read, &read)
+		gob.NewDecoder(bytes.NewReader(ud.Read)).Decode(&read)
 		for _, s := range stories {
-			read[s.Feed] = append(read[s.Feed], s.Story)
+			read[s] = true
 		}
-		b, _ := json.Marshal(&read)
-		ud.Read = b
+		var b bytes.Buffer
+		gob.NewEncoder(&b).Encode(&read)
+		ud.Read = b.Bytes()
+		_, err := gn.Put(ud)
+		return err
+	}, nil)
+}
+
+func MarkUnread(c mpg.Context, w http.ResponseWriter, r *http.Request) {
+	cu := user.Current(c)
+	gn := goon.FromContext(c)
+	read := make(Read)
+	f := r.FormValue("feed")
+	s := r.FormValue("story")
+	rs := readStory{Feed: f, Story: s}
+	u := &User{Id: cu.ID}
+	ud := &UserData{
+		Id:     "data",
+		Parent: gn.Key(u),
+	}
+	gn.RunInTransaction(func(gn *goon.Goon) error {
+		if err := gn.Get(ud); err != nil {
+			return err
+		}
+		gob.NewDecoder(bytes.NewReader(ud.Read)).Decode(&read)
+		delete(read, rs)
+		b := bytes.Buffer{}
+		gob.NewEncoder(&b).Encode(&read)
+		ud.Read = b.Bytes()
 		_, err := gn.Put(ud)
 		return err
 	}, nil)
@@ -476,10 +554,22 @@ func ExportOpml(c mpg.Context, w http.ResponseWriter, r *http.Request) {
 	gn.Get(&ud)
 	opml := Opml{}
 	json.Unmarshal(ud.Opml, &opml)
+	opml.Version = "1.0"
+	opml.Title = fmt.Sprintf("%s subscriptions in Go Read", u.Email)
+	for _, o := range opml.Outline {
+		o.Text = o.Title
+		if len(o.XmlUrl) > 0 {
+			o.Type = "rss"
+		}
+		for _, so := range o.Outline {
+			so.Text = so.Title
+			so.Type = "rss"
+		}
+	}
 	b, _ := xml.MarshalIndent(&opml, "", "\t")
 	w.Header().Add("Content-Type", "text/xml")
 	w.Header().Add("Content-Disposition", "attachment; filename=subscriptions.opml")
-	fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>`, string(b))
+	fmt.Fprint(w, xml.Header, string(b))
 }
 
 func UploadOpml(c mpg.Context, w http.ResponseWriter, r *http.Request) {

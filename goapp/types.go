@@ -55,7 +55,11 @@ type UserData struct {
 	Read   []byte         `datastore:"r,noindex"`
 }
 
-type Read map[string][]string
+type readStory struct {
+	Feed, Story string
+}
+
+type Read map[readStory]bool
 
 type Feed struct {
 	_kind      string        `goon:"kind,F"`
@@ -129,7 +133,7 @@ type StoryContent struct {
 type OpmlOutline struct {
 	Outline []*OpmlOutline `xml:"outline" json:",omitempty"`
 	Title   string         `xml:"title,attr,omitempty" json:",omitempty"`
-	XmlUrl  string         `xml:"xmlUrl,attr" json:",omitempty"`
+	XmlUrl  string         `xml:"xmlUrl,attr,omitempty" json:",omitempty"`
 	Type    string         `xml:"type,attr,omitempty" json:",omitempty"`
 	Text    string         `xml:"text,attr,omitempty" json:",omitempty"`
 	HtmlUrl string         `xml:"htmlUrl,attr,omitempty" json:",omitempty"`
@@ -138,6 +142,7 @@ type OpmlOutline struct {
 type Opml struct {
 	XMLName string         `xml:"opml"`
 	Version string         `xml:"version,attr"`
+	Title   string         `xml:"head>title"`
 	Outline []*OpmlOutline `xml:"body>outline"`
 }
 
@@ -152,3 +157,9 @@ type Image struct {
 	Blob appengine.BlobKey `datastore:"b,noindex"`
 	Url  string            `datastore:"u,noindex"`
 }
+
+type Stories []*Story
+
+func (s Stories) Len() int           { return len(s) }
+func (s Stories) Less(i, j int) bool { return s[i].Created.Before(s[j].Created) }
+func (s Stories) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
