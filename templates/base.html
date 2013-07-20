@@ -17,6 +17,7 @@
 			</button>
 			<div class="container-fluid">
 				<a class="brand" href="{{url "main"}}">irakurri go</a>
+				<a ng-click="toggleSubscriptionsMenu()" class="btn show-subscriptions">Subscriptions</a>
 				<div class="nav-collapse collapse">
 					<ul class="nav">
 						<li ng-class="{active: shown == 'about'}"><a href="#" ng-click="shown = 'about'">about</a></li>
@@ -167,8 +168,11 @@
 
 		{{if .User}}
 		<div class="row-fluid" ng-init="refresh()">
-			<div ng-show="opts.nav && !nothing() && shown == 'feeds'" id="feed-list">
-				<ul class="unstyled">
+			<div ng-class="subscriptionsIsOpen()" ng-show="opts.nav && !nothing() && shown == 'feeds'" id="feed-list">
+				<ul class="unstyled feed-list__subscribe-ul">
+					<li class="feed-list__close">
+						<a class="btn btn-inverse btn-small" ng-click="toggleSubscriptionsMenu()">X</a>
+					</li>
 					<li>
 						<button class="btn btn-primary" ng-click="setAddSubscription()">subscribe</button>
 					<li>
@@ -441,6 +445,8 @@
 				</div>
 		</div>
 	</div>
+
+	<div id="mask" ng-class="subscriptionsIsOpen()"></div>
 
 	<script src="{{.Jquery}}"></script>
 	<script src="{{.JqueryUI}}"></script>

@@ -210,6 +210,20 @@ goReadAppModule.controller('GoreadCtrl', function($scope, $http, $timeout, $wind
 		$scope.markAllRead(story);
 	};
 
+	$scope.showSubscriptions = false;
+
+	$scope.toggleSubscriptionsMenu = function() {
+		$scope.showSubscriptions = !$scope.showSubscriptions;
+	};
+
+	$scope.subscriptionsIsOpen = function() {
+		if ($scope.showSubscriptions) {
+			return 'is-open';
+		} else {
+			return '';
+		} 
+	}
+
 	$scope.prev = function() {
 		if ($scope.currentStory > 0) {
 			$scope.setCurrent($scope.currentStory - 1);
@@ -467,6 +481,7 @@ goReadAppModule.controller('GoreadCtrl', function($scope, $http, $timeout, $wind
 		$scope.applyGetFeed();
 		$scope.updateUnreadCurrent();
 		$scope.resetScroll();
+		$scope.toggleSubscriptionsMenu();
 	};
 
 	$scope.setActiveFolder = function(folder) {

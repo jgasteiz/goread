@@ -4,6 +4,9 @@
 body {
 	padding-top: 40px;
 }
+iframe {
+	max-width: 100%;
+}
 .hand {
 	cursor: hand;
 	cursor: pointer;
@@ -19,6 +22,9 @@ li .btn-group + .btn-group {
 .nav li .btn-group .dropdown-toggle .caret {
 	border-top-color: #777;
 	border-bottom-color: #777;
+}
+.show-subscriptions {
+	display: none;
 }
 .story {
 	border-bottom: 1px solid #ccc;
@@ -89,7 +95,7 @@ li .btn-group + .btn-group {
 }
 .active-name {
 	font-weight: bold;
-	padding: 10px 0;
+	padding: 10px;
 }
 #story-list {
 	position: absolute;
@@ -171,8 +177,47 @@ a.brand {
 	.navbar-fixed-top {
 		margin-bottom: 0;
 	}
+	.show-subscriptions {
+		display: inline-block;
+	}
 	#feed-list {
+		border-radius: 2px;
 		display: none;
+		background: #fff;
+		padding: 10px;
+		bottom: auto;
+		left: 0;
+		width: auto;
+		right: 20px;
+		left: 20px;
+		z-index: 20;
+	}
+	#feed-list.is-open {
+		display: block !important;
+	}
+	.feed-list__subscribe-ul {
+		padding-right: 30px;
+		position: relative;
+	}
+	.feed-list__close {
+		font-weight: 700;
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
+	#mask {
+		display: none;
+		position: absolute;
+		background: black;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		opacity: 0.8;
+		z-index: 16;
+	}
+	#mask.is-open {
+		display: block !important;
 	}
 	#story-list {
 		position: static;
@@ -180,8 +225,15 @@ a.brand {
 		margin-right: -19px;
 	}
 	.story-header {
-		padding: 0;
+		padding: 0 10px;
 		height: 43px;
 		line-height: 43px;
+	}
+	.story.selected {
+		border: none;
+	}
+	.story-content {
+		margin: 0;
+		padding: 0 10px;
 	}
 }
