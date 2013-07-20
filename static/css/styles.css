@@ -123,13 +123,6 @@ li .btn-group + .btn-group {
 .top-margin {
 	margin-top: 20px;
 }
-a.brand {
-	background-image: url("/static/icon.png");
-	background-repeat: no-repeat;
-	background-position: 20px 7px;
-	background-size: 24px;
-	padding-left: 54px !important;
-}
 .bold {
 	font-weight: bold;
 }
@@ -144,14 +137,22 @@ a.brand {
 }
 .navbar-fixed-top .navbar-inner,
 .navbar-fixed-bottom .navbar-inner {
-	padding: 5px 20px;
+	padding: 0 20px;
 }
 .navbar .brand {
 	margin: 0 !important;
 	padding-left: 36px !important;
 }
 a.brand {
+	background-image: url("/static/icon.png");
+	background-repeat: no-repeat;
 	background-position: left center;
+	background-size: 24px;
+	padding-left: 54px !important;
+}
+.navbar .brand-palm {
+	display: none;
+	height: 20px;
 }
 .hero-unit h1 {
 	margin-bottom: 20px;
@@ -179,11 +180,13 @@ a.brand {
 #feed-list::-webkit-scrollbar { width: 8px; }
 #feed-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
 #feed-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.4); }
-@media (max-width: 767px) {
+@media (max-width: 979px) {
 	body {
 		margin: 0;
 		padding: 0;
 	}
+}
+@media (max-width: 767px) {
 	.navbar {
 		margin: 0;
 	}
@@ -199,6 +202,12 @@ a.brand {
 		background-position: 0px 7px;
 		padding-left: 34px !important;
 		margin-left: -4px !important;
+	}
+	.navbar .brand-palm {
+		display: inline-block;
+	}
+	.navbar .brand-wide {
+		display: none;
 	}
 	.navbar-fixed-top {
 		margin-bottom: 0;
@@ -232,9 +241,13 @@ a.brand {
 		top: 0;
 		right: 0;
 	}
+	.feed-title, .folder-title {
+		padding: 10px 0;
+		border-bottom: 1px solid #ccc;
+	}
 	#mask {
 		display: none;
-		position: absolute;
+		position: fixed;
 		background: black;
 		top: 0;
 		bottom: 0;
