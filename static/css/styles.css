@@ -7,6 +7,12 @@ body {
 iframe {
 	max-width: 100%;
 }
+.home-container {
+	padding: 0 20px;
+}
+.feed-container {
+	margin: 0 -20px;
+}
 .hand {
 	cursor: hand;
 	cursor: pointer;
@@ -29,6 +35,7 @@ li .btn-group + .btn-group {
 .story {
 	border-bottom: 1px solid #ccc;
 	border-left: 1px solid #fff;
+	margin: 0 -20px;
 }
 .story.selected {
 	border-left: 1px solid #0088cc;
@@ -157,9 +164,11 @@ a.brand {
 .hero-unit h1 {
 	margin-bottom: 20px;
 }
-
 .btn-login {
 	font-weight: 700;
+}
+.alert-info {
+	margin-bottom: 10px;
 }
 
 /*
@@ -272,7 +281,7 @@ a.brand {
 		padding: 0 10px;
 	}
 	.hero-unit {
-		padding: 40px;
+		padding: 20px;
 	}
 	.hero-unit h1 {
 		font-size: 40px;

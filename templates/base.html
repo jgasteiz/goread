@@ -117,7 +117,7 @@
 								<li><a href="#" ng-click="setAddSubscription()">add subscription</a></li>
 								<li><a href="#" ng-click="shown = 'import-opml'">import opml</a></li>
 								<li class="divider"></li>
-								<li><a href="https://go-read.appspot.com/">goread over HTTPS</a></li>
+								<li><a href="https://irakurrigo.appspot.com/">irakurrigo over HTTPS</a></li>
 								<li><a href="{{url "export-opml"}}">export opml</a></li>
 								<li><a href="{{url "logout"}}">logout</a></li>
 								<li class="divider"></li>
@@ -133,37 +133,29 @@
 			</div>
 		</div>
 	</div>
-	<div class="container-fluid">
+	<div class="container-fluid home-container">
 		<div class="row-fluid top-margin" ng-show="shown == 'about'">
 			<div class="offset3 span6">
 				<h1>About</h1>
-				<p>Go Read is a web-based RSS reader.</p>
+				<p>Irakurri Go is a web-based RSS reader.</p>
 				<p>It is designed to be as useful as Google Reader.</p>
-				<p>
-					Built by <a href="http://mattjibson.com">Matt Jibson</a>.
-					Runs on <a href="https://developers.google.com/appengine/">Google App Engine</a>.
-					Powered by <a href="http://golang.org/">Go</a> and <a href="http://angularjs.org/">AngularJS</a>.
-					Code on <a href="https://github.com/mjibson/goread">GitHub</a>.
-				</p>
+				<p class="alert alert-info">Irakurri Go is a fork of <a target="_blank" href="http://irakurrigo.appspot.com/"><strong>Go Read</strong></a>.</p>
+				<p>Forked and modified by <a href="http://javimanzano.me">Javi Manzano</a>.</p>
 				<h1>Help</h1>
 				<p>Problems? Try one of these:</p>
-				<p>Tweet me <a href="https://twitter.com/mjibson">@mjibson</a></p>
-				<p>Email me at <a href="mailto:matt.jibson@gmail.com">matt.jibson@gmail.com</a></p>
-				<p>Submit a <a href="https://github.com/mjibson/goread/issues">GitHub issue</a></p>
+				<p>Tweet me <a href="https://twitter.com/jgasteiz">@jgasteiz</a></p>
+				<p>Email me at <a href="mailto:javi.manzano.oller@gmail.com">javi.manzano.oller@gmail.com</a></p>
+				<p>Submit a <a href="https://github.com/jgasteiz/irakurrigo/issues">GitHub issue</a></p>
 				<h1>FAQ</h1>
 				<p>
 					<strong>Are there keyboard shortcuts?</strong>
 					Yes, press <button class="btn" ng-click="shortcuts.modal('toggle')">?</button>.
 				</p>
 				<p>
-					<strong>What is on your todo list?</strong>
-					Check the <a href="https://github.com/mjibson/goread/issues">GitHub issues</a> page.
-				</p>
-				<p>
 					<strong>Is there a bookmarklet/submit URL?</strong>
 					Drag this link to your browser toolbar:
-					<h4><a href="javascript:window.location=%22http://www.goread.io/user/add-subscription?url=%22+encodeURIComponent(document.location)">add to go read</a></h4>
-					Or submit to <code>http://www.goread.io/user/add-subscription?url=%s</code> where <code>%s</code> is the feed URL.
+					<h4><a href="javascript:window.location=%22http://irakurrigo.appspot.com/user/add-subscription?url=%22+encodeURIComponent(document.location)">add to go read</a></h4>
+					Or submit to <code>http://irakurrigo.appspot.com/user/add-subscription?url=%s</code> where <code>%s</code> is the feed URL.
 					Firefox users can <a href="#" ng-click="registerHandler()">register go read as an RSS reader</a>.
 				</p>
 			</div>
@@ -372,7 +364,7 @@
 						<p>Irakurri Go is a web-based RSS reader.</p>
 						<p>It is designed to be as useful as Google Reader.</p>
 						<p><a class="btn btn-primary btn-large btn-login" href="{{url "login-google"}}">sign up / log in with google</a></p>
-						<p class="alert alert-info">Irakurri Go is a fork of <a target="_blank" href="http://www.goread.io/"><strong>Go Read</strong></a>.</p>
+						<p class="alert alert-info">Irakurri Go is a fork of <a target="_blank" href="http://irakurrigo.appspot.com/"><strong>Go Read</strong></a>.</p>
 					</div>
 				</div>
 			</div>
