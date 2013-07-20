@@ -17,7 +17,9 @@
 			</button>
 			<div class="container-fluid">
 				<a class="brand" href="{{url "main"}}">irakurri go</a>
+				{{if .User}}
 				<a ng-click="toggleSubscriptionsMenu()" class="btn show-subscriptions">Subscriptions</a>
+				{{end}}
 				<div class="nav-collapse collapse">
 					<ul class="nav">
 						<li ng-class="{active: shown == 'about'}"><a href="#" ng-click="shown = 'about'">about</a></li>
@@ -168,7 +170,7 @@
 
 		{{if .User}}
 		<div class="row-fluid" ng-init="refresh()">
-			<div ng-class="subscriptionsIsOpen()" ng-show="opts.nav && !nothing() && shown == 'feeds'" id="feed-list">
+			<div ng-class="subscriptionsIsOpen()" ng-show="opts.nav && !nothing() && shown == 'feeds'" class="span3" id="feed-list">
 				<ul class="unstyled feed-list__subscribe-ul">
 					<li class="feed-list__close">
 						<a class="btn btn-inverse btn-small" ng-click="toggleSubscriptionsMenu()">X</a>
@@ -220,6 +222,7 @@
 				ng-class="navspan()"
 				ng-style="navmargin()"
 				id="story-list"
+				class="span9"
 				data-url-upload="{{url "upload-opml"}}"
 				data-url-options="{{url "save-options"}}"
 				data-url-get-feed="{{url "get-feed"}}"
@@ -365,39 +368,41 @@
 				<div class="offset1 span10" ng-hide="shown">
 					<div class="hero-unit">
 						<h1>Hi, RSS user</h1>
-						<p>Irakurri Go, a fork of <a target="_blank" href="http://www.goread.io/">Go Read</a>, is a web-based RSS reader.</p>
+						<p>Irakurri Go is a web-based RSS reader.</p>
 						<p>It is designed to be as useful as Google Reader.</p>
-						<p><a class="btn btn-primary btn-large" href="{{url "login-google"}}">sign up / log in with google</a></p>
-						<p class="alert alert-info">Read the <strong><a target="_blank" href="http://mattjibson.com/blog/2013/06/26/go-read-open-source-google-reader-clone/">blog post</a></strong> about the original application, Go Read.</p>
+						<p><a class="btn btn-primary btn-large btn-login" href="{{url "login-google"}}">sign up / log in with google</a></p>
+						<p class="alert alert-info">Irakurri Go is a fork of <a target="_blank" href="http://www.goread.io/"><strong>Go Read</strong></a>.</p>
 					</div>
 				</div>
 			</div>
 			<div class="row-fluid">
 				<ul class="thumbnails">
 					<li class="offset1 span5">
-						<div class="thumbnail">
-							<div class="caption">
-								<h3>features</h3>
-								<ul>
-									<li>import from Google Reader or OPML</li>
-									<li>same keyboard shortcuts as Google Reader</li>
-									<li>fast, snappy, and clean</li>
-								</ul>
-							</div>
-						</div>
+						<section class="box">
+							<h1 class="box__heading">features</h1>
+							<ul class="box__list">
+								<li>import from Google Reader or OPML</li>
+								<li>same keyboard shortcuts as Google Reader</li>
+								<li>fast, snappy, and clean</li>
+							</ul>
+						</section>
 					</li>
 					<li class="span5">
-						<div class="thumbnail">
-							<div class="caption">
-								<h3>recent updates</h3>
-								<ul>
-									<li>07/14: keep stories unread</li>
-									<li>07/10: correctly determine unread stories; allow subscriptions with stripe</li>
-									<li>07/07: mark items read on scroll; podcast support</li>
-									<li>07/03: improved OPML support; middle click story titles to open; fixed the &quot;no feeds show up&quot; bug; numerous bug fixes and tweaks</li>
-								</ul>
-							</div>
-						</div>
+						<section class="box">
+							<h1 class="box__heading">recent updates</h1>
+							<ul class="box__list">
+								<li>07/20: now you can select subscriptions in small devices</li>
+							</ul>
+						</section>
+						<section class="box">
+							<h1 class="box__heading">recent core updates</h1>
+							<ul class="box__list">
+								<li>07/14: keep stories unread</li>
+								<li>07/10: correctly determine unread stories; allow subscriptions with stripe</li>
+								<li>07/07: mark items read on scroll; podcast support</li>
+								<li>07/03: improved OPML support; middle click story titles to open; fixed the &quot;no feeds show up&quot; bug; numerous bug fixes and tweaks</li>
+							</ul>
+						</section>
 					</li>
 				</ul>
 			</div>
@@ -446,7 +451,9 @@
 		</div>
 	</div>
 
+	{{if .User}}
 	<div id="mask" ng-class="subscriptionsIsOpen()"></div>
+	{{end}}
 
 	<script src="{{.Jquery}}"></script>
 	<script src="{{.JqueryUI}}"></script>

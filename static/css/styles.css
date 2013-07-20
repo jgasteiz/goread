@@ -2,7 +2,7 @@
 	display: none;
 }
 body {
-	padding-top: 40px;
+	margin-top: 60px;
 }
 iframe {
 	max-width: 100%;
@@ -97,32 +97,14 @@ li .btn-group + .btn-group {
 	font-weight: bold;
 	padding: 10px;
 }
-#story-list {
-	position: absolute;
-	left: 245px;
-	overflow-y: auto;
-	top: 40px;
-	bottom: 0;
-	right: 0;
-}
 #story-list.no-nav {
 	left: 20px;
 }
-#story-list .config {
-	margin-right: 20px;
-}
-#feed-list {
-	position: absolute;
-	font-size: 13px;
-	width: 220px;
-	top: 40px;
-	bottom: 0;
-	overflow: hidden;
-	left: 20px;
-	padding-top: 10px;
-}
 #feed-list:hover {
 	overflow-y: auto;
+}
+.feed-list__close {
+	display: none;
 }
 .active {
 	color: #d14;
@@ -151,15 +133,59 @@ a.brand {
 .bold {
 	font-weight: bold;
 }
+
+
+
+/*
+	Bootstrap overwrites
+*/
+.navbar {
+	margin: 0 -20px 20px;
+}
+.navbar-fixed-top .navbar-inner,
+.navbar-fixed-bottom .navbar-inner {
+	padding: 5px 20px;
+}
+.navbar .brand {
+	margin: 0 !important;
+	padding-left: 36px !important;
+}
+a.brand {
+	background-position: left center;
+}
+.hero-unit h1 {
+	margin-bottom: 20px;
+}
+
+.btn-login {
+	font-weight: 700;
+}
+
+/*
+	Modules
+*/
+.box {
+	border: 1px solid #ddd;
+	margin-bottom: 10px;
+	padding: 20px;
+}
+.box__heading {
+	font-size: 22px;
+}
+
 #story-list::-webkit-scrollbar { width: 8px; height: 8px }
 #story-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
 #story-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.4); }
 #feed-list::-webkit-scrollbar { width: 8px; }
 #feed-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
 #feed-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.4); }
-@media (max-width: 979px) {
+@media (max-width: 767px) {
 	body {
-		padding-top: 0;
+		margin: 0;
+		padding: 0;
+	}
+	.navbar {
+		margin: 0;
 	}
 	body, .story-header, .story-content, .btn {
 		font-size: 14px;
@@ -181,15 +207,15 @@ a.brand {
 		display: inline-block;
 	}
 	#feed-list {
-		border-radius: 2px;
-		display: none;
 		background: #fff;
-		padding: 10px;
+		border-radius: 2px;
 		bottom: auto;
-		left: 0;
-		width: auto;
-		right: 20px;
+		display: none;
 		left: 20px;
+		padding: 10px;
+		position: absolute;
+		right: 20px;
+		width: auto;
 		z-index: 20;
 	}
 	#feed-list.is-open {
@@ -200,6 +226,7 @@ a.brand {
 		position: relative;
 	}
 	.feed-list__close {
+		display: inline-block;
 		font-weight: 700;
 		position: absolute;
 		top: 0;
@@ -219,11 +246,6 @@ a.brand {
 	#mask.is-open {
 		display: block !important;
 	}
-	#story-list {
-		position: static;
-		margin-left: -19px;
-		margin-right: -19px;
-	}
 	.story-header {
 		padding: 0 10px;
 		height: 43px;
@@ -235,5 +257,14 @@ a.brand {
 	.story-content {
 		margin: 0;
 		padding: 0 10px;
+	}
+	.hero-unit {
+		padding: 40px;
+	}
+	.hero-unit h1 {
+		font-size: 40px;
+	}
+	.hero-unit .alert-info {
+		margin: 0;
 	}
 }
